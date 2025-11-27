@@ -1,0 +1,100 @@
+✅ Deployment Checklist
+1. Environment Variables
+Move all secrets out of code and into .env files or hosting platform secrets:
+
+GOOGLE_CLIENT_ID
+
+GOOGLE_CLIENT_SECRET
+
+GITHUB_CLIENT_ID
+
+GITHUB_CLIENT_SECRET
+
+SUPABASE_URL
+
+SUPABASE_KEY
+
+JWT_SECRET
+
+REDIRECT_URI → must point to your production domain (e.g. https://fixforge.com/auth/callback).
+
+Ensure .env is not committed to GitHub (.gitignore).
+
+2. Backend (FastAPI)
+CORS: Update allowed origins to your production frontend domain:
+
+python
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://fixforge.com"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+Routes: Confirm /api/auth/google and /api/auth/github are included in main.py.
+
+Deployment options:
+
+Render / Railway / Fly.io → simple FastAPI hosting.
+
+Docker → containerize backend for portability.
+
+Supabase → keep DB hosted there.
+
+3. Frontend (React + Vite)
+Update vite.config.js proxy for production:
+
+In dev: proxy to http://localhost:8000.
+
+In prod: remove proxy, use relative /api/... since frontend and backend will share the same domain.
+
+Build frontend:
+
+bash
+npm run build
+Deploy options:
+
+Vercel / Netlify → serve React build.
+
+Or serve React build directly from FastAPI (mount dist/ as static files).
+
+4. OAuth Settings
+Update Google Cloud Console:
+
+Authorized redirect URI → https://fixforge.com/auth/callback
+
+Update GitHub Developer Settings:
+
+Authorization callback URL → https://fixforge.com/auth/callback
+
+Make sure both providers have your production domain registered.
+
+5. Database (Supabase)
+Confirm tables (users, sessions, etc.) are migrated and production‑ready.
+
+Use Supabase project keys for production (not local dev keys).
+
+Ensure row‑level security (RLS) is configured if needed.
+
+6. JWT & Security
+Use a strong JWT_SECRET in production.
+
+Set token expiry (e.g. 1 hour) and refresh logic if needed.
+
+Store JWT in httpOnly cookies or secure storage (localStorage is fine for MVP, but cookies are safer).
+
+7. Domain & SSL
+Point your domain (e.g. fixforge.com) to your hosting provider.
+
+Ensure HTTPS (SSL) is enabled — OAuth providers require secure redirect URIs.
+
+🚀 Deployment Flow Example
+Backend → Deploy FastAPI on Render (with Supabase DB).
+
+Frontend → Deploy React build on Vercel.
+
+Domain → Point fixforge.com to Vercel, proxy /api to backend.
+
+OAuth → Update Google/GitHub redirect URIs to https://fixforge.com/auth/callback.
+
+Test → Login with Google/GitHub → JWT stored → redirect to dashboard.
