@@ -1,4 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
+const API_BASE =
+  import.meta.env.VITE_API_BASE ||
+  "https://shy6565-fixforge-backend.hf.space";
 const API_KEY = import.meta.env.VITE_EXT_KEY || "dev-key";
 
 async function request(path, { method = "GET", body } = {}) {
