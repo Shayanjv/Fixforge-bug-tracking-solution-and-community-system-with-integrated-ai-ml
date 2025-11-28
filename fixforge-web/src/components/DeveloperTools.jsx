@@ -22,8 +22,7 @@ import { toast } from "sonner";
 import { useUser } from '@/hooks/useUser';
 
 export function DeveloperTools() {
-  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
-";
+  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space";
   const API_KEY = import.meta.env.VITE_EXT_KEY || "";
 
   const { user, loading: authLoading } = useUser();

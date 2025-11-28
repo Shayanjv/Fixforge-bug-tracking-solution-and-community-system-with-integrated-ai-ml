@@ -13,8 +13,7 @@ import { toast } from "sonner";
 
 export function EditProfile({ userData, onClose, onSave }) {
   const { user } = useUser();
-  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
-";
+  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space";
   const API_KEY = import.meta.env.VITE_EXT_KEY || "";
 
   const [selectedTags, setSelectedTags] = useState([]);

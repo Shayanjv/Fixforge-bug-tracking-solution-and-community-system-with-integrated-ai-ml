@@ -26,8 +26,8 @@ export function SolutionDetail() {
 
   const readOnly = location.state?.readOnly || false;
 
-  const API_BASE = (import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
-").replace(/\/+$/, "");
+  const API_BASE = (import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space").replace(/\/+$/, "");
+
   const API_KEY = import.meta.env.VITE_EXT_KEY || "";
 
   const [solution, setSolution] = useState(null);

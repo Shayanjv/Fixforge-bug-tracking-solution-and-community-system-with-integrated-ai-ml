@@ -4,8 +4,7 @@ import { Check, X } from "lucide-react";
 import { useUser } from '@/hooks/useUser';
 
 export function ProfileCompletion() {
-  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
-";
+  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space";
   const API_KEY = import.meta.env.VITE_EXT_KEY || "";
   
   const { user } = useUser();

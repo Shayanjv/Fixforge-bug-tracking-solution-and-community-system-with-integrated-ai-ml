@@ -15,8 +15,7 @@ import { useUser } from '@/hooks/useUser';
 import { useNavigate } from 'react-router-dom';
 
 export function ActivityPage() {
-  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
-";
+  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space";
   const { user, loading: authLoading } = useUser();
   const navigate = useNavigate();
 
