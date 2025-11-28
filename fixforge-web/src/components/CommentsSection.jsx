@@ -8,7 +8,8 @@ import { toast } from "sonner";
 
 export function CommentsSection({ solutionId }) {
   const { user } = useUserContext();
-  const API_BASE = (import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000").replace(/\/+$/, "");
+  const API_BASE = (import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
+").replace(/\/+$/, "");
   const API_KEY = import.meta.env.VITE_EXT_KEY || "";
 
   const [comments, setComments] = useState([]);

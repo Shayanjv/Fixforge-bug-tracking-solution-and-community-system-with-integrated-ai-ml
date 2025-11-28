@@ -24,7 +24,8 @@ export default function AIProcessor() {
         setStatus("processing");
 
         // Call your backend API that uses Gemini
-        const response = await fetch(`http://127.0.0.1:8000/aisuggested/${bugId}`);
+        const response = await fetch(`https://shy6565-fixforge-backend.hf.space
+/aisuggested/${bugId}`);
         
         if (!response.ok) {
           throw new Error(`API error: ${response.status}`);

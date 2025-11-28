@@ -8,7 +8,8 @@ import { useUserContext } from "../context/UserContext";
 
 import { BugCard } from "./BugCard";
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = "https://shy6565-fixforge-backend.hf.space
+";
 
 export default function MyBugs() {
   const { user, loading, error } = useUserContext();

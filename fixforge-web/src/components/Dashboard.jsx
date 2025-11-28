@@ -3,7 +3,8 @@ import { Search } from "lucide-react";
 import { BugCard } from "./BugCard";
 
 export default function Dashboard() {
-  const API_BASE = "http://127.0.0.1:8000";
+  const API_BASE = "https://shy6565-fixforge-backend.hf.space
+";
 
   // Data
   const [bugs, setBugs] = useState([]);

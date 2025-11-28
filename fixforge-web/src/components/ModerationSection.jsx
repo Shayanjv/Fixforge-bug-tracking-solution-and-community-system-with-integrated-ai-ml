@@ -11,7 +11,8 @@ import { useUser } from '@/hooks/useUser';
 
 // ✅ CHANGED - Removed userId and userRole props
 export function ModerationSection() {
-  const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
+  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
+";
   const API_KEY = import.meta.env.VITE_EXT_KEY || "";
 
   // ✅ ADD THIS - Get authenticated user from Supabase

@@ -28,7 +28,8 @@ export default function AISuggested() {
   useEffect(() => {
     async function load() {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/aisuggested/${bugId}`);
+        const res = await fetch(`https://shy6565-fixforge-backend.hf.space
+/aisuggested/${bugId}`);
         const responseData = await res.json();
         
         if (!res.ok) {

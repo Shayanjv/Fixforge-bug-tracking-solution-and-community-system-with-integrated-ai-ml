@@ -5,7 +5,8 @@ import { Trophy, Star, Target, TrendingUp, Flame, Award, Zap, Bug } from "lucide
 import { useUser } from '@/hooks/useUser';
 
 export function ContributionStats() {
-  const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
+  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
+";
   const { user, loading: authLoading } = useUser();
 
   const [stats, setStats] = useState({

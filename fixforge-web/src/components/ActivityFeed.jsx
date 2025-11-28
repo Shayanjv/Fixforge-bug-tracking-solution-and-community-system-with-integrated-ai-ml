@@ -17,7 +17,8 @@ import { useUser } from '@/hooks/useUser';
 import { Link } from 'react-router-dom';
 
 export function ActivityFeed() {
-  const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000";
+  const API_BASE = import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
+";
   const { user, loading: authLoading } = useUser();
 
   const [activities, setActivities] = useState([]);

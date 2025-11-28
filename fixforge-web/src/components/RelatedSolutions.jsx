@@ -8,7 +8,8 @@ import { ThumbsUp, MessageSquare, Eye } from "lucide-react";
 export default function RelatedSolutions() {
   const navigate = useNavigate();
   const { bugId } = useParams();
-  const API_BASE = (import.meta.env.VITE_API_BASE || "http://127.0.0.1:8000").replace(/\/+$/, "");
+  const API_BASE = (import.meta.env.VITE_API_BASE || "https://shy6565-fixforge-backend.hf.space
+").replace(/\/+$/, "");
   const API_KEY = import.meta.env.VITE_EXT_KEY || "";
 
   const [solutions, setSolutions] = useState([]);
