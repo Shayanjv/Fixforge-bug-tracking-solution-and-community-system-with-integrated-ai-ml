@@ -1,0 +1,12 @@
+﻿__pycache__/
+*.py[cod]
+venv/
+env/
+.env
+*.env
+!.env.example
+node_modules/
+.DS_Store
+Thumbs.db
+fixforge-1/endee-temp/
+*.log

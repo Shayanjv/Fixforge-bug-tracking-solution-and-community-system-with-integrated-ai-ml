@@ -163,13 +163,111 @@ def call_gemini(prompt: str, model: str, retries: int = 2, delay: int = 5) -> st
 # --- Route ---
 @router.get("/{bug_id}")
 def ai_suggested_fix(bug_id: str):
+    from app.services.endee_client import endee_service
+    from sentence_transformers import SentenceTransformer
+    
     print(f"🔵 Generating AI suggestion for bug: {bug_id}")
     
+    # Fetch target bug from Supabase
     bug = get_bug_context(bug_id)
     if not bug:
         raise HTTPException(status_code=404, detail="Bug not found")
+    
+    # ✅ RAG STEP 1: Generate embedding for target bug
+    model = SentenceTransformer("all-MiniLM-L6-v2")
+    bug_text = f"{bug['title']} {bug.get('description', '')} {bug.get('severity', '')} {bug.get('client_type', '')}"
+    bug_vector = model.encode(bug_text).tolist()
+    
+    # ✅ RAG STEP 2: Search Endee for similar SOLVED bugs
+    similar_bugs = endee_service.search_similar_bugs(
+        query_vector=bug_vector,
+        top_k=5,
+        metadata_filters={"status": "Solved"},
+        min_score=0.7  # Only use reasonably similar bugs
+    )
+    
+    print(f"🔍 Found {len(similar_bugs)} similar solved bugs for RAG context")
+    
+    # ✅ RAG STEP 3: Fetch solutions for similar bugs from Supabase
+    context_solutions = []
+    if similar_bugs:
+        bug_ids = [sb["id"] for sb in similar_bugs]
+        solutions_res = supabase.table("solutions").select("*").in_("bug_id", bug_ids).execute()
+        
+        # Group solutions by bug
+        solutions_by_bug = {}
+        for sol in (solutions_res.data or []):
+            bug_id_key = sol["bug_id"]
+            if bug_id_key not in solutions_by_bug:
+                solutions_by_bug[bug_id_key] = []
+            solutions_by_bug[bug_id_key].append(sol)
+        
+        # Build context with similarity scores
+        for sb in similar_bugs:
+            if sb["id"] in solutions_by_bug:
+                context_solutions.append({
+                    "bug_id": sb["id"],
+                    "similarity": sb["score"],
+                    "solutions": solutions_by_bug[sb["id"]]
+                })
+    
+    # ✅ RAG STEP 4: Build enriched prompt with context
+    prompt = f"""**TARGET BUG TO FIX:**
+Bug ID: {bug['id']}
+Title: {bug['title']}
+Description: {bug.get('description', 'N/A')}
+Category: {bug.get('category', 'N/A')}
+Client Type: {bug.get('client_type', 'N/A')}
+Severity: {bug.get('severity', 'N/A')}
+"""
 
-    prompt = build_prompt(bug)
+    # Add RAG context if available
+    if context_solutions:
+        prompt += f"\n\n**CONTEXT: Similar Solved Bugs ({len(context_solutions)} cases)**\n"
+        for idx, ctx in enumerate(context_solutions[:3], 1):  # Top 3 for context
+            prompt += f"\n[Case {idx} - {ctx['similarity']*100:.0f}% similar]\n"
+            for sol in ctx['solutions'][:1]:  # First solution from each bug
+                solution_preview = sol.get('content', '')[:300]
+                prompt += f"- Solution: {solution_preview}...\n"
+    
+    # Add code context if available
+    if bug.get('code'):
+        code_lang = bug.get('code_language', 'unknown')
+        prompt += f"\n\n**USER'S CODE ({code_lang.upper()}):**\n{bug['code']}\n"
+
+    # Add screenshot notes if available
+    if bug.get('screenshot_notes'):
+        prompt += f"\n**Screenshot Context:** {bug['screenshot_notes']}\n"
+
+    prompt += """
+
+**Task:** Analyze this bug and provide a comprehensive fix.
+
+**Your response should include:**
+
+1. **Root Cause Analysis**
+   - What is causing this bug?
+   - Why is it happening in this specific context?
+
+2. **Debugging Checklist**
+   - Step-by-step debugging approach
+   - What to check first, second, third
+
+3. **Fix Implementation**
+   - Provide complete, working code fixes
+   - Include filename and line numbers
+   - Explain each change
+
+4. **Testing Strategy**
+   - How to verify the fix works
+   - Edge cases to test
+
+5. **Prevention**
+   - How to avoid this bug in the future
+   - Best practices
+
+**Format your code blocks like this:**
+"""
     
     # ✅ Check if screenshot exists
     screenshot_base64 = None
@@ -216,4 +314,6 @@ def ai_suggested_fix(bug_id: str):
         "code_language": bug.get("code_language"),
         "model_used": model_used,
         "suggestion": suggestion,
+        "rag_context_count": len(context_solutions),  # ✅ Show how many similar cases were used
+        "rag_enabled": True
     }

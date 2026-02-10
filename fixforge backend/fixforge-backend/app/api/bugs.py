@@ -47,6 +47,8 @@ async def submit_bug(
     user_id: str = Form(...),  # Add this
     screenshot: UploadFile = File(None),
 ):
+    from app.services.endee_client import endee_service
+    
     bug_id = f"FF-{uuid.uuid4().hex[:8]}"
     created_at = datetime.now(timezone.utc).isoformat()
 
@@ -57,38 +59,36 @@ async def submit_bug(
             tags_list = [str(tags_list)]
     except Exception:
         tags_list = []
-    # --- DUPLICATE CHECK LOGIC ---
+    
+    
+    # Generate embedding and check for similar bugs
     new_text = f"{title} {description} {severity} {clientType} {' '.join(tags_list)}"
-    new_vec = model.encode(new_text).reshape(1, -1)
-
-    bugs_res = supabase.table("bugs").select("*").execute()
-    bugs = bugs_res.data or []
-
-    if bugs:
-        bug_texts = [
-            f"{b['title']} {b['description']} {b['severity']} {b['client_type']} {' '.join(b.get('tags', []))}"
-            for b in bugs
-        ]
-        bug_vecs = model.encode(bug_texts)
-        sims = cosine_similarity(new_vec, bug_vecs)[0]
-        max_idx = sims.argmax()
-        max_sim = float(sims[max_idx])
-        matched_bug_id = bugs[max_idx]["id"]
-
-        if max_sim >= 0.85:
-
-            solutions_res = supabase.table("solutions").select("id").eq("bug_id", matched_bug_id).execute()
-            has_solutions = bool(solutions_res.data and len(solutions_res.data) > 0)
-            solution_count = len(solutions_res.data or [])
-            return {
-                "message": "Duplicate bug found",
-                "bug_id": matched_bug_id,
-                "similarity_score": max_sim,
-                "has_solutions": has_solutions,
-                "solution_count": solution_count,
-                "is_duplicate": True,
-            }
-    # --- END of DUPLICATE CHECK LOGIC ---
+    new_vec = model.encode(new_text).tolist()
+    
+    similar_results = endee_service.search_similar_bugs(
+        query_vector=new_vec,
+        top_k=1,
+        metadata_filters={"status": {"$ne": "Closed"}},
+        min_score=0.0
+    )
+    
+    if similar_results and similar_results[0].get("score", 0) >= 0.85:
+        matched_bug_id = similar_results[0]["id"]
+        similarity_score = similar_results[0]["score"]
+        
+        solutions_res = supabase.table("solutions").select("id").eq("bug_id", matched_bug_id).execute()
+        has_solutions = bool(solutions_res.data and len(solutions_res.data) > 0)
+        solution_count = len(solutions_res.data or [])
+        
+        return {
+            "message": "Duplicate bug found",
+            "bug_id": matched_bug_id,
+            "similarity_score": similarity_score,
+            "has_solutions": has_solutions,
+            "solution_count": solution_count,
+            "is_duplicate": True,
+        }
+    
 
     bug = {
         "id": bug_id,
@@ -136,6 +136,20 @@ async def submit_bug(
 
         except Exception as e:
             print("Screenshot upload or attachment insert failed:", e)
+    
+    # ✅ UPSERT VECTOR TO ENDEE
+    # Store bug embedding in Endee for future semantic search
+    endee_service.upsert_bug_vector(
+        bug_id=bug_id,
+        embedding=new_vec,
+        metadata={
+            "title": title,
+            "severity": severity,
+            "status": "Open",
+            "tags": tags_list,
+            "created_at": created_at
+        }
+    )
 
     return {"message": "Bug submitted successfully", "bug_id": bug_id}
 from fastapi import Path

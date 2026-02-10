@@ -7,7 +7,7 @@ from app.core.config import supabase
 from app.api import bugs, solutions , clusters, aisuggested, bug_clusters, cluster_routes
 
 # Import new router routes (from app/routers folder)
-from app.routers import getsolution, users, auth, api_keys, moderation
+from app.routers import getsolution, users, auth, api_keys, moderation, search
 from app.routers import comments
 
 app = FastAPI(title="FixForge Backend", version="1.0.0")
@@ -42,6 +42,19 @@ app.include_router(moderation.router, prefix="/moderation", tags=["Moderation"])
 
 app.include_router(comments.router, prefix="/comments", tags=["Comments"])
 
+# ✅ ENDEE: Register semantic search router
+app.include_router(search.router, prefix="/search", tags=["Semantic Search"])
+
+
+@app.on_event("startup")
+def startup_event():
+    """Initialize services on startup"""
+    # Initialize Endee connection
+    from app.services.endee_client import endee_service
+    print("✅ Endee service initialized")
+    
+    # Ensure storage bucket exists
+    ensure_storage_bucket()
 
 @app.on_event("startup")
 def ensure_storage_bucket():
