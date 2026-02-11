@@ -456,37 +456,6 @@ curl "http://localhost:8000/aisuggested/FF-a1b2c3d4"
 - Otherwise, creates new bug + upserts vector to Endee
 
 ---
-
-## 🎓 Endee Labs Evaluation Alignment
-
-### Project Requirements Checklist
-
-| Criterion | Implementation | Evidence |
-|-----------|----------------|----------|
-| **Use Endee as vector database** | ✅ | Self-hosted Endee server via Docker; all vectors stored in Endee index `fixforge_bugs` |
-| **Fork Endee repository** | ✅ | Forked from https://github.com/endee-io/endee |
-| **Vector search is core** | ✅ | 3 critical features depend on Endee: duplicate detection, semantic search, RAG |
-| **Semantic Search use case** | ✅ | `/search/semantic` endpoint enables natural language bug queries |
-| **RAG use case (optional)** | ✅ | `/aisuggested/{id}` retrieves context from Endee → Gemini generates grounded responses |
-| **Recommendations** | ✅ | Duplicate detection recommends existing bugs based on 85%+ similarity |
-| **GitHub-ready project** | ✅ | Complete README, setup docs, API documentation |
-| **Clear architecture** | ✅ | Diagram + explanation of Endee/Supabase/Gemini separation |
-| **Why Endee explanation** | ✅ | 5 specific technical reasons documented above |
-| **Well-defined project** | ✅ | Solves real problem (duplicate bugs), demonstrable value |
-
----
-
-### Why This Project Stands Out
-
-1. **Real Business Value**: Solves measurable problem (duplicate bug reports waste ~15-20% of developer time)
-2. **Production-Quality Code**: Error handling, type hints, logging, migration scripts
-3. **Complete Documentation**: Implementation plan, walkthrough, test reports, setup guides
-4. **3 Use Cases** (requirement: 1): Semantic Search + RAG + Recommendations
-5. **Clear Endee Justification**: Not "because assignment requires it" - 5 technical reasons
-6. **Architectural Best Practices**: Proper separation of concerns (Endee/Supabase/K-Means)
-
----
-
 ## 🧪 Testing
 
 ### Manual Testing
@@ -533,7 +502,7 @@ curl -X POST http://localhost:8000/bugs/submit \
 
 ## 👥 Team
 
-**Project Author**: [Your Name]  
+**Project Author**: [shayana J V]  
 **Submission**: Endee Labs Internship Evaluation  
 **Date**: February 2026
 
@@ -547,7 +516,7 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - **Endee Labs** for the high-performance open-source vector database
 - **Sentence Transformers** for the embedding model
@@ -555,4 +524,4 @@ This project is licensed under the MIT License - see LICENSE file for details.
 
 ---
 
-**Ready for Evaluation** ✅
+
